@@ -27,3 +27,41 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: mvn verify sonar:sonar -Dsonar.host.url=https://sonarcloud.io -Dsonar.organization=devonarya -Dsonar.projectKey=devonarya-Java_basic
+    - name: Upload build artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: app-jar
+        path: target/*.jar
+      deploy-staging:
+    name: Deploy to Staging
+    needs: build
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: app-jar
+
+      - name: Simulate deployment to staging
+        run: |
+          echo ">> Deploying to STAGING environment..."
+          ls -la
+          echo ">> Deployment to staging completed."
+
+  deploy-production:
+    name: Deploy to Production
+    needs: deploy-staging
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: app-jar
+
+      - name: Simulate deployment to production
+        run: |
+          echo ">> Deploying to PRODUCTION environment..."
+          ls -la
+          echo ">> Deployment to production completed."
